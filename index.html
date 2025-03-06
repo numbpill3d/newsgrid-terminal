@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsGrid Terminal // LIVE FEED</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/crt-effects.css">
+</head>
+<body>
+    <!-- CRT Screen Effect -->
+    <div class="crt-effect"></div>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>NewsGrid Terminal</h1>
+        <div class="navbar-links">
+            <a href="#">Home</a>
+            <a href="#">Politics</a>
+            <a href="#">Tech</a>
+            <a href="#">Entertainment</a>
+            <a href="#">Sports</a>
+        </div>
+    </div>
+
+    <!-- News Ticker -->
+    <div class="news-ticker">
+        <div class="news-ticker-content" id="tickerContent">
+            <!-- RSS feed content will be inserted here -->
+            <a href="#">LOADING NEWS FEED...</a>
+            <a href="#">PLEASE STAND BY...</a>
+            <a href="#">CONNECTING TO MAINFRAME...</a>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="container">
+        <!-- COLUMN 1 -->
+        <div class="column">
+            <!-- Reddit Feed Widget -->
+            <div class="widget">
+                <h2 class="widget-title">r/politics live feed</h2>
+                <div class="widget-content" id="redditFeed">
+                    <p>Loading latest posts...</p>
+                </div>
+            </div>
+            
+            <!-- Instagram Feed Widget -->
+            <div class="widget">
+                <h2 class="widget-title">Instagram Updates</h2>
+                <div class="widget-content" id="instagramFeed">
+                    <p>Loading Instagram feed...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- COLUMN 2 -->
+        <div class="column">
+            <!-- YouTube TV Widget -->
+            <div class="widget">
+                <h2 class="widget-title">Live Broadcast</h2>
+                <div class="widget-content" id="youtubePlayer">
+                    <p>Loading broadcast feed...</p>
+                </div>
+            </div>
+            
+            <!-- Threads.net Feed Widget -->
+            <div class="widget">
+                <h2 class="widget-title">Threads Updates</h2>
+                <div class="widget-content" id="threadsFeed">
+                    <p>Loading Threads feed...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- COLUMN 3 -->
+        <div class="column">
+            <!-- Favorites Widget -->
+            <div class="widget">
+                <h2 class="widget-title">Saved Headlines</h2>
+                <div class="widget-content" id="favoritesFeed">
+                    <p>Your saved articles will appear here...</p>
+                </div>
+            </div>
+            
+            <!-- Article Screenshots Widget -->
+            <div class="widget">
+                <h2 class="widget-title">Recent Articles</h2>
+                <div class="widget-content" id="articleScreenshots">
+                    <p>Recent article screenshots will appear here...</p>
+                </div>
+            </div>
+            
+            <!-- Interactive Books Widget -->
+            <div class="widget">
+                <h2 class="widget-title">Book Database</h2>
+                <div class="widget-content" id="interactiveBooks">
+                    <p>Click on book covers to reveal definitions...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Button -->
+    <button class="start-button" id="startButton">START</button>
+
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="https://via.placeholder.com/50" alt="User Avatar">
+            <h3>User Profile</h3>
+        </div>
+        <ul class="sidebar-links">
+            <li><a href="#"><span>►</span> Twitter</a></li>
+            <li><a href="#"><span>►</span> LinkedIn</a></li>
+            <li><a href="#"><span>►</span> GitHub</a></li>
+            <li><a href="#"><span>►</span> Email</a></li>
+            <li><a href="#"><span>►</span> Settings</a></li>
+        </ul>
+    </div>
+
+    <!-- JavaScript for Interactivity -->
+    <script src="js/main.js"></script>
+    <script src="js/news-ticker.js"></script>
+    <script src="js/reddit-feed.js"></script>
+    <script src="js/youtube-player.js"></script>
+    <script src="js/social-feeds.js"></script>
+    <script src="js/favorites-widget.js"></script>
+    <script src="js/articles-widget.js"></script>
+    <script src="js/books-widget.js"></script>
+</body>
+</html>
