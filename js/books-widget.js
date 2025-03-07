@@ -5,8 +5,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function setupInteractiveBooksWidget() {
     const interactiveBooksElement = document.getElementById('interactiveBooks');
-    
+    if (!interactiveBooksElement) {
+        console.error('Interactive books element not found');
+        return;
+    }
+
     // Sample political and news analysis books
+
     const books = [
         {
             title: "Democracy in the Digital Age",
@@ -63,11 +68,15 @@ function setupInteractiveBooksWidget() {
     
     books.forEach((book, index) => {
         booksHTML += `
-            <div class="book-item" data-index="${index}">
+            <div class="book-item" data-index="${index}" tabindex="0" role="button" 
+             aria-label="Book: ${book.title} by ${book.author}">
                 <div class="book-cover">
+
                     <img src="${book.coverUrl}" alt="${book.title} cover">
                     <div class="book-category">${book.category}</div>
+                    ${book.securityLevel ? `<div class="security-level">${book.securityLevel}</div>` : ''}
                 </div>
+
                 <div class="book-info">
                     <h4 class="book-title">${book.title}</h4>
                     <div class="book-meta">
@@ -130,8 +139,9 @@ function setupInteractiveBooksWidget() {
                 background: #33ff33;
                 box-shadow: 0 0 5px #33ff33;
                 animation: pulse 2s infinite;
+                will-change: opacity;
             }
-            
+
             .header-meta {
                 display: flex;
                 justify-content: space-between;
@@ -140,26 +150,43 @@ function setupInteractiveBooksWidget() {
                 border-left: 3px solid var(--primary-orange);
                 font-family: 'Courier New', monospace;
             }
-            
+
             .books-header h3 {
                 font-size: 0.9rem;
                 color: var(--light-text);
                 text-transform: uppercase;
                 margin: 0;
             }
-            
+
             .books-counter {
                 font-size: 0.7rem;
                 color: var(--primary-orange);
                 font-family: 'Courier New', monospace;
             }
-            
+
+            // Update the grid CSS
             .books-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
                 gap: 10px;
             }
-            
+
+            // Add media query for smaller screens
+            @media (max-width: 480px) {
+                .books-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                }
+
+                .book-cover {
+                    height: 120px;
+                }
+
+                .book-title {
+                    font-size: 0.7rem;
+                }
+            }
+
+
             .book-item {
                 background-color: rgba(0, 30, 60, 0.6);
                 border: 1px solid rgba(255, 255, 255, 0.1);
@@ -169,7 +196,7 @@ function setupInteractiveBooksWidget() {
                 position: relative;
                 overflow: hidden;
             }
-            
+
             .book-category {
                 position: absolute;
                 top: 0;
@@ -180,6 +207,18 @@ function setupInteractiveBooksWidget() {
                 font-size: 0.6rem;
                 font-weight: bold;
             }
+
+            .security-level {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                background: rgba(255, 0, 0, 0.7);
+                color: white;
+                padding: 2px 5px;
+                font-size: 0.6rem;
+                font-weight: bold;
+            }
+
 
             .access-prompt {
                 position: absolute;
@@ -203,6 +242,7 @@ function setupInteractiveBooksWidget() {
 
             .prompt-icon {
                 animation: blink 1s infinite;
+                will-change: opacity;
             }
 
             .book-item::before {
@@ -220,22 +260,33 @@ function setupInteractiveBooksWidget() {
                 transition: opacity 0.3s;
                 z-index: 10;
             }
-            
+
             .book-item:hover::before {
                 opacity: 1;
             }
-            
+
+            .security-level {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                background: rgba(255, 0, 0, 0.7);
+                color: white;
+                padding: 2px 5px;
+                font-size: 0.6rem;
+                font-weight: bold;
+            }
             .book-item:hover {
                 transform: scale(1.03);
                 box-shadow: 0 0 10px rgba(0, 83, 155, 0.7);
                 border: 1px solid var(--primary-orange);
             }
-            
+
+
             .book-item.active {
                 border: 1px solid var(--primary-orange);
                 box-shadow: 0 0 15px rgba(244, 125, 48, 0.5);
             }
-            
+
             .book-cover {
                 position: relative;
                 width: 100%;
@@ -243,22 +294,22 @@ function setupInteractiveBooksWidget() {
                 overflow: hidden;
                 margin-bottom: 5px;
             }
-            
+
             .book-cover img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
                 transition: filter 0.3s;
             }
-            
+
             .book-item:hover .book-cover img {
                 filter: brightness(1.2);
             }
-            
+
             .book-info {
                 padding: 5px 0;
             }
-            
+
             .book-title {
                 font-size: 0.8rem;
                 margin: 0 0 5px 0;
@@ -267,14 +318,14 @@ function setupInteractiveBooksWidget() {
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
-            
+
             .book-meta {
                 display: flex;
                 justify-content: space-between;
                 font-size: 0.6rem;
                 color: #aaa;
             }
-            
+
             .book-definition {
                 background-color: rgba(0, 20, 40, 0.8);
                 border: 1px solid var(--primary-blue);
@@ -283,45 +334,57 @@ function setupInteractiveBooksWidget() {
                 min-height: 150px;
                 position: relative;
             }
-            
+
             .definition-header {
                 margin-bottom: 10px;
             }
-            
+
             .definition-header h4 {
                 font-size: 0.8rem;
                 color: var(--primary-orange);
                 margin: 0;
                 text-transform: uppercase;
             }
-            
+
             .definition-terminal-line {
                 height: 2px;
                 background: linear-gradient(to right, var(--primary-orange), transparent);
                 margin-top: 5px;
             }
-            
+
             .definition-content {
                 font-size: 0.8rem;
                 color: var(--light-text);
                 line-height: 1.4;
             }
-            
+
             .definition-content p {
                 margin: 0;
             }
-            
+
             /* Terminal cursor blinking effect */
             .cursor-effect {
                 border-right: 0.15em solid var(--primary-orange);
                 animation: blinking-cursor 1s step-end infinite;
             }
-            
+
             @keyframes blinking-cursor {
                 from, to { border-color: transparent; }
                 50% { border-color: var(--primary-orange); }
             }
+
+            @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.5; }
+                100% { opacity: 1; }
+            }
+
+            @keyframes blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0; }
+            }
         </style>
+
     `;
     
     interactiveBooksElement.innerHTML = booksHTML;
@@ -346,29 +409,29 @@ function setupInteractiveBooksWidget() {
             
             definitionHeader.textContent = `${book.title} (${book.year})`;
             
-            // Simulate typing effect for the definition
-            definitionContent.innerHTML = `<p class="cursor-effect"></p>`;
-            const textElement = definitionContent.querySelector('p');
-            
-            let i = 0;
-            const definitionText = book.definition;
-            const typeSpeed = 20; // milliseconds
-            
-            function typeWriter() {
-                if (i < definitionText.length) {
-                    textElement.textContent += definitionText.charAt(i);
-                    i++;
-                    setTimeout(typeWriter, typeSpeed);
-                } else {
-                    // Remove cursor effect when typing is complete
-                    textElement.classList.remove('cursor-effect');
+            // Replace the typing effect code with this more efficient version
+            function typeDefinition(element, text, speed = 20) {
+                let i = 0;
+                element.textContent = '';
+                element.classList.add('cursor-effect');
+
+                // Use requestAnimationFrame for smoother animation
+                function type() {
+                    if (i < text.length) {
+                        element.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(() => requestAnimationFrame(type), speed);
+                    } else {
+                        element.classList.remove('cursor-effect');
+                    }
                 }
+
+                requestAnimationFrame(type);
             }
-            
-            // Start typing effect
-            textElement.textContent = '';
-            i = 0;
-            setTimeout(typeWriter, 200);
+
+            // Then use it in your click handler
+            const textElement = definitionContent.querySelector('p');
+            typeDefinition(textElement, book.definition);
         });
     });
 }
