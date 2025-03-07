@@ -6,6 +6,7 @@
     <title>NewsGrid Terminal // LIVE FEED</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/crt-effects.css">
+    <link rel="icon" type="image/svg+xml" href="assets/icons/terminal-icon.svg">
 </head>
 <body>
     <!-- CRT Screen Effect -->
@@ -45,11 +46,11 @@
                 </div>
             </div>
             
-            <!-- Instagram Feed Widget -->
+            <!-- Bluesky Feed Widget -->
             <div class="widget">
-                <h2 class="widget-title">Instagram Updates</h2>
+                <h2 class="widget-title">BLUESKY NETWORK</h2>
                 <div class="widget-content" id="instagramFeed">
-                    <p>Loading Instagram feed...</p>
+                    <p>ESTABLISHING SECURE CONNECTION...</p>
                 </div>
             </div>
         </div>
@@ -102,7 +103,41 @@
     </div>
 
     <!-- Start Button -->
-    <button class="start-button" id="startButton">START</button>
+    <button class="start-button" id="startButton">
+        <img src="assets/icons/start-icon.svg" alt="Start" class="start-icon">
+        <span class="start-text">INITIALIZE</span>
+    </button>
+
+    <style>
+        .start-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(to right, var(--primary-blue), rgba(0, 83, 155, 0.8));
+            padding: 12px 20px;
+            border: 2px solid var(--primary-orange);
+            box-shadow: 
+                0 0 10px rgba(0, 83, 155, 0.7),
+                inset 0 0 5px rgba(244, 125, 48, 0.5);
+        }
+
+        .start-icon {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) invert(1);
+        }
+
+        .start-text {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .start-button:hover {
+            background: linear-gradient(to right, var(--primary-orange), rgba(244, 125, 48, 0.8));
+            border-color: var(--primary-blue);
+        }
+    </style>
 
     <!-- Sidebar Menu -->
     <div class="sidebar" id="sidebar">

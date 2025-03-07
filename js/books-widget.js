@@ -6,35 +6,40 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupInteractiveBooksWidget() {
     const interactiveBooksElement = document.getElementById('interactiveBooks');
     
-    // Sample books data with hidden definitions
+    // Sample political and news analysis books
     const books = [
         {
-            title: "Neuromancer",
-            author: "William Gibson",
+            title: "Democracy in the Digital Age",
+            author: "Matthew Hindman",
             coverUrl: "https://via.placeholder.com/150x200",
-            year: "1984",
-            definition: "A groundbreaking cyberpunk novel that coined the term 'cyberspace' and predicted the internet. The story follows Case, a washed-up computer hacker hired for one last job that involves an artificial intelligence seeking to free itself."
+            year: "2023",
+            definition: "A comprehensive analysis of how digital technology and social media are reshaping democratic institutions. Explores the impact of algorithmic content distribution on public discourse and political polarization.",
+            category: "POLITICAL SCIENCE",
+            securityLevel: "LEVEL 2"
         },
         {
-            title: "Snow Crash",
-            author: "Neal Stephenson",
+            title: "The Fourth Estate",
+            author: "Jeffrey Gottfried",
             coverUrl: "https://via.placeholder.com/150x200",
-            year: "1992",
-            definition: "This novel combines the Sumerian language, linguistics, virtual reality, and ancient mythology to explore a future where corporations have replaced nations and a virus called Snow Crash threatens to take down hackers in both the virtual and real worlds."
+            year: "2024",
+            definition: "An examination of modern journalism's role in democracy. Details how traditional media adapts to digital transformation while maintaining its watchdog function in society.",
+            category: "MEDIA STUDIES"
         },
         {
-            title: "Do Androids Dream of Electric Sheep?",
-            author: "Philip K. Dick",
+            title: "Global Power Dynamics",
+            author: "Sarah Chen",
             coverUrl: "https://via.placeholder.com/150x200",
-            year: "1968",
-            definition: "The novel that inspired Blade Runner, this book explores the distinction between humans and androids in a post-apocalyptic world, questioning what it means to be human through the journey of bounty hunter Rick Deckard."
+            year: "2024",
+            definition: "Analysis of shifting international relations in the multipolar world. Examines economic interdependence, technological competition, and emerging power structures.",
+            category: "INTERNATIONAL RELATIONS"
         },
         {
-            title: "Burning Chrome",
-            author: "William Gibson",
+            title: "The AI Revolution",
+            author: "Marcus Turner",
             coverUrl: "https://via.placeholder.com/150x200",
-            year: "1986",
-            definition: "A collection of short stories set in the same universe as Neuromancer. The title story introduced the concept of 'cyberspace,' while another story, 'Johnny Mnemonic,' was later adapted into a film."
+            year: "2024",
+            definition: "Investigation into artificial intelligence's impact on governance, privacy, and democratic processes. Includes case studies of AI in political campaigns and policy-making.",
+            category: "TECHNOLOGY & POLITICS"
         }
     ];
     
@@ -42,8 +47,17 @@ function setupInteractiveBooksWidget() {
     let booksHTML = `
         <div class="books-container">
             <div class="books-header">
-                <h3>Cyberpunk Literature Database</h3>
-                <div class="books-counter">DATABASE: ${books.length} ENTRIES</div>
+                <div class="header-main">
+                    <h3>POLITICAL ANALYSIS DATABASE</h3>
+                    <div class="database-status">
+                        <span class="status-light"></span>
+                        <span class="status-text">ONLINE</span>
+                    </div>
+                </div>
+                <div class="header-meta">
+                    <div class="books-counter">ENTRIES: ${books.length}</div>
+                    <div class="system-time">${new Date().toLocaleTimeString('en-US', { hour12: false })}</div>
+                </div>
             </div>
             <div class="books-grid">`;
     
@@ -52,12 +66,17 @@ function setupInteractiveBooksWidget() {
             <div class="book-item" data-index="${index}">
                 <div class="book-cover">
                     <img src="${book.coverUrl}" alt="${book.title} cover">
+                    <div class="book-category">${book.category}</div>
                 </div>
                 <div class="book-info">
                     <h4 class="book-title">${book.title}</h4>
                     <div class="book-meta">
                         <span class="book-author">${book.author}</span>
                         <span class="book-year">${book.year}</span>
+                    </div>
+                    <div class="access-prompt">
+                        <span class="prompt-text">ACCESS FILE</span>
+                        <span class="prompt-icon">►</span>
                     </div>
                 </div>
             </div>
@@ -85,12 +104,41 @@ function setupInteractiveBooksWidget() {
             }
             
             .books-header {
+                margin-bottom: 15px;
+            }
+            
+            .header-main {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 margin-bottom: 10px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                padding-bottom: 5px;
+                padding: 10px;
+                background: rgba(0, 30, 60, 0.8);
+                border: 1px solid var(--primary-blue);
+            }
+            
+            .database-status {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .status-light {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #33ff33;
+                box-shadow: 0 0 5px #33ff33;
+                animation: pulse 2s infinite;
+            }
+            
+            .header-meta {
+                display: flex;
+                justify-content: space-between;
+                padding: 5px 10px;
+                background: rgba(0, 0, 0, 0.3);
+                border-left: 3px solid var(--primary-orange);
+                font-family: 'Courier New', monospace;
             }
             
             .books-header h3 {
@@ -122,8 +170,43 @@ function setupInteractiveBooksWidget() {
                 overflow: hidden;
             }
             
+            .book-category {
+                position: absolute;
+                top: 0;
+                right: 0;
+                background: var(--primary-blue);
+                color: white;
+                padding: 2px 5px;
+                font-size: 0.6rem;
+                font-weight: bold;
+            }
+
+            .access-prompt {
+                position: absolute;
+                bottom: 5px;
+                left: 5px;
+                right: 5px;
+                background: rgba(0, 0, 0, 0.8);
+                padding: 3px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.6rem;
+                color: var(--primary-orange);
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .book-item:hover .access-prompt {
+                opacity: 1;
+            }
+
+            .prompt-icon {
+                animation: blink 1s infinite;
+            }
+
             .book-item::before {
-                content: 'CLICK';
+                content: 'CLASSIFIED';
                 position: absolute;
                 top: 50%;
                 left: 50%;

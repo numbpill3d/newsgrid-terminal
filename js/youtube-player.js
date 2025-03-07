@@ -1,37 +1,63 @@
-// YouTube Player Script
+// YouTube Player Configuration
+const YOUTUBE_CONFIG = {
+    channels: [
+        { id: 'UCeY0bbntWzzVIaj2z3QigXg', name: 'NBC News', videoId: 'live' },
+        { id: 'UCBi2mrWuNuyYy4gbM6fU18Q', name: 'ABC News', videoId: 'live' },
+        { id: 'UCupvZG-5ko_eiXAupbDfxWw', name: 'CNN News', videoId: 'live' },
+        { id: 'UC8p1vwvWtl6T73JiExfWs1g', name: 'CBS News', videoId: 'live' }
+    ],
+    defaultChannel: 0,
+    retryAttempts: 3,
+    retryDelay: 5000
+};
+
+// Initialize YouTube Player
 document.addEventListener('DOMContentLoaded', function() {
-    setupYouTubePlayer();
+    initYouTubePlayer();
 });
 
-function setupYouTubePlayer() {
-    const youtubePlayer = document.getElementById('youtubePlayer');
-    
-    // Retro TV frame HTML structure
-    const tvHTML = `
+function initYouTubePlayer() {
+    const container = document.getElementById('youtubePlayer');
+    setupTVFrame(container);
+    loadYouTubeAPI();
+}
+
+function setupTVFrame(container) {
+    container.innerHTML = `
         <div class="retro-tv">
             <div class="tv-frame">
                 <div class="tv-screen">
-                    <div class="tv-static" id="tvStatic"></div>
-                    <div class="tv-content" id="videoContainer">
-                        <!-- YouTube iframe will be inserted here -->
+                    <div class="tv-content">
                         <div id="ytplayer"></div>
+                        <div class="tv-overlay">
+                            <div class="channel-info" id="channelInfo"></div>
+                            <div class="news-banner" id="newsBanner">LIVE NEWS FEED</div>
+                        </div>
+                        <div class="tv-static" id="tvStatic"></div>
+                        <div class="tv-scanlines"></div>
                     </div>
                 </div>
                 <div class="tv-controls">
                     <div class="tv-brand">OMNI CONSUMER PRODUCTS</div>
                     <div class="tv-knobs">
-                        <div class="tv-knob"></div>
-                        <div class="tv-knob"></div>
-                        <div class="tv-channels">
-                            <button data-video="9OBnvpzb560" class="channel-button">CH1</button>
-                            <button data-video="jAXioRNYy4s" class="channel-button">CH2</button>
-                            <button data-video="Xgda7RHzD8I" class="channel-button">CH3</button>
-                        </div>
+                        <div class="channel-display" id="channelDisplay">CH-1</div>
+                        <div class="tv-channels" id="channelButtons"></div>
                     </div>
+                </div>
+                <div class="tv-status" id="tvStatus">
+                    <div class="status-light"></div>
+                    <span class="status-text">SIGNAL LOCKED</span>
                 </div>
             </div>
         </div>
-        
+        ${generateTVStyles()}
+    `;
+
+    setupChannelButtons();
+}
+
+function generateTVStyles() {
+    return `
         <style>
             .retro-tv {
                 width: 100%;
@@ -40,45 +66,26 @@ function setupYouTubePlayer() {
             }
             
             .tv-frame {
-                background-color: #333;
+                background: linear-gradient(45deg, #1a1a1a, #333);
                 border-radius: 15px;
                 padding: 20px;
-                box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+                box-shadow: 
+                    0 0 20px rgba(0, 0, 0, 0.5),
+                    inset 0 0 10px rgba(0, 0, 0, 0.8);
                 position: relative;
                 overflow: hidden;
-            }
-            
-            .tv-frame::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(0, 0, 0, 0.2) 100%);
-                pointer-events: none;
             }
             
             .tv-screen {
                 background-color: #000;
                 position: relative;
                 width: 100%;
-                padding-top: 56.25%; /* 16:9 Aspect Ratio */
+                padding-top: 56.25%;
                 border-radius: 10px;
                 overflow: hidden;
-                box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
-            }
-            
-            .tv-static {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJub2lzZSIgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNTUiIG51bU9jdGF2ZXM9IjMiIHN0aXRjaFRpbGVzPSJzdGl0Y2giIHJlc3VsdD0idHVyYnVsZW5jZSIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIi8+PC9zdmc+');
-                opacity: 0.1;
-                z-index: 1;
-                pointer-events: none;
+                box-shadow: 
+                    inset 0 0 20px rgba(0, 0, 0, 0.9),
+                    0 0 5px rgba(var(--primary-blue-rgb), 0.5);
             }
             
             .tv-content {
@@ -95,39 +102,106 @@ function setupYouTubePlayer() {
                 height: 100%;
             }
             
+            .tv-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 3;
+                pointer-events: none;
+            }
+            
+            .channel-info {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: rgba(0, 0, 0, 0.7);
+                color: var(--primary-orange);
+                padding: 5px 10px;
+                font-family: 'Courier New', monospace;
+                font-size: 0.8rem;
+                border: 1px solid var(--primary-orange);
+            }
+            
+            .news-banner {
+                position: absolute;
+                bottom: 20px;
+                left: 0;
+                width: 100%;
+                background: var(--primary-blue);
+                color: white;
+                text-align: center;
+                padding: 5px;
+                font-family: 'Courier New', monospace;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                opacity: 0.8;
+            }
+            
+            .tv-static {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANxM8mAAAACHRSTlMzABEiM0Qid4dJv+8AAACWSURBVHjaZc4xCgJBDIXhN8u2UQsRQe1E8AqWW3gAsfQGHsAT2FjYegd7K/EIHsAjiAii5Wz2DYrDwBTzQTIPEp6ZzBJAGC2c/QigYZBWEkijpWUEbduGXTx89MP+iP3hD/1V5qZxOcTt1r2PY1yBqyNUZ3b0S7qXrYQHKjMnqWVKXLJKaK0E8+YlL68hZKV09vjHF8wvF4w0fx4CAAAAAElFTkSuQmCC');
+                opacity: 0.05;
+                pointer-events: none;
+                z-index: 4;
+                animation: staticNoise 0.2s steps(4) infinite;
+            }
+            
+            .tv-scanlines {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    to bottom,
+                    transparent 50%,
+                    rgba(0, 0, 0, 0.1) 51%
+                );
+                background-size: 100% 4px;
+                z-index: 5;
+                pointer-events: none;
+                opacity: 0.3;
+            }
+            
             .tv-controls {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 10px 0;
+                padding: 15px 0;
                 margin-top: 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
             }
             
             .tv-brand {
                 font-family: 'Courier New', monospace;
                 font-weight: bold;
-                font-size: 0.7rem;
-                color: #aaa;
+                font-size: 0.8rem;
+                color: var(--primary-orange);
                 text-transform: uppercase;
+                text-shadow: 0 0 5px rgba(244, 125, 48, 0.5);
             }
             
             .tv-knobs {
                 display: flex;
                 align-items: center;
-                gap: 10px;
+                gap: 15px;
             }
             
-            .tv-knob {
-                width: 15px;
-                height: 15px;
-                background-color: #666;
-                border-radius: 50%;
-                box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-                cursor: pointer;
-            }
-            
-            .tv-knob:hover {
-                background-color: #888;
+            .channel-display {
+                background: #000;
+                color: var(--primary-orange);
+                padding: 5px 10px;
+                font-family: 'Courier New', monospace;
+                font-size: 0.8rem;
+                border: 1px solid var(--primary-orange);
+                text-shadow: 0 0 5px rgba(244, 125, 48, 0.5);
             }
             
             .tv-channels {
@@ -136,76 +210,130 @@ function setupYouTubePlayer() {
             }
             
             .channel-button {
-                background-color: #222;
-                color: #aaa;
-                border: 1px solid #444;
+                background: rgba(0, 30, 60, 0.8);
+                color: var(--light-text);
+                border: 1px solid var(--primary-blue);
                 font-family: 'Courier New', monospace;
-                font-size: 0.6rem;
-                padding: 3px 6px;
+                font-size: 0.7rem;
+                padding: 5px 10px;
                 cursor: pointer;
+                transition: all 0.3s ease;
             }
             
             .channel-button:hover {
-                background-color: var(--primary-orange);
+                background: var(--primary-orange);
                 color: #000;
+                border-color: var(--primary-orange);
             }
             
             .channel-button.active {
-                background-color: var(--primary-blue);
+                background: var(--primary-blue);
                 color: white;
+                border-color: var(--primary-orange);
+                box-shadow: 0 0 10px rgba(0, 83, 155, 0.5);
+            }
+            
+            .tv-status {
+                position: absolute;
+                bottom: 10px;
+                right: 20px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .status-light {
+                width: 8px;
+                height: 8px;
+                background: var(--primary-orange);
+                border-radius: 50%;
+                animation: blink 2s infinite;
+            }
+            
+            .status-text {
+                color: var(--primary-orange);
+                font-family: 'Courier New', monospace;
+                font-size: 0.7rem;
+            }
+            
+            @keyframes staticNoise {
+                0% { transform: translate(0,0) }
+                25% { transform: translate(-2%,-2%) }
+                50% { transform: translate(2%,2%) }
+                75% { transform: translate(-2%,2%) }
+                100% { transform: translate(2%,-2%) }
+            }
+            
+            @keyframes blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            
+            .error-screen {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: #000;
+                color: var(--primary-orange);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                font-family: 'Courier New', monospace;
+                z-index: 10;
+            }
+            
+            .error-screen h3 {
+                margin-bottom: 10px;
+                text-transform: uppercase;
+            }
+            
+            .error-screen p {
+                font-size: 0.8rem;
+                opacity: 0.8;
             }
         </style>
     `;
-    
-    youtubePlayer.innerHTML = tvHTML;
-    
-    // Load YouTube IFrame API
+}
+
+function loadYouTubeAPI() {
+    if (window.YT) {
+        initPlayer();
+        return;
+    }
+
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     const firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     
-    // Setup global variables for YouTube player
-    window.player = null;
-    window.currentVideoId = '9OBnvpzb560'; // Default video (Media Break from RoboCop)
-    
-    // Setup channel buttons
-    setupChannelButtons();
+    window.onYouTubeIframeAPIReady = initPlayer;
 }
 
-// Function called by YouTube API when ready
-window.onYouTubeIframeAPIReady = function() {
-    loadYouTubeVideo(window.currentVideoId);
-    
-    // Hide the static effect after video loads
-    setTimeout(() => {
-        document.getElementById('tvStatic').style.opacity = '0.05';
-    }, 2000);
-};
+function initPlayer() {
+    const defaultChannel = YOUTUBE_CONFIG.channels[YOUTUBE_CONFIG.defaultChannel];
+    createPlayer(defaultChannel.videoId);
+}
 
-// Helper function to load YouTube video
-function loadYouTubeVideo(videoId) {
-    // If player already exists, just load new video
-    if (window.player) {
-        window.player.loadVideoById(videoId);
-        return;
-    }
-    
-    // Create new player
+function createPlayer(videoId) {
     window.player = new YT.Player('ytplayer', {
         videoId: videoId,
         playerVars: {
-            'autoplay': 1,
-            'controls': 0,
-            'rel': 0,
-            'showinfo': 0,
-            'modestbranding': 1,
-            'iv_load_policy': 3,
-            'fs': 0
+            autoplay: 1,
+            controls: 0,
+            rel: 0,
+            showinfo: 0,
+            modestbranding: 1,
+            iv_load_policy: 3,
+            fs: 0
         },
         events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
+            onReady: onPlayerReady,
+            onStateChange: onPlayerStateChange,
+            onError: onPlayerError
         }
     });
 }
@@ -213,40 +341,88 @@ function loadYouTubeVideo(videoId) {
 function onPlayerReady(event) {
     event.target.setVolume(50);
     event.target.playVideo();
+    updateChannelInfo(YOUTUBE_CONFIG.channels[YOUTUBE_CONFIG.defaultChannel]);
 }
 
 function onPlayerStateChange(event) {
-    // If video ends, show static effect more prominently
-    if (event.data === YT.PlayerState.ENDED) {
-        document.getElementById('tvStatic').style.opacity = '0.3';
+    const static = document.getElementById('tvStatic');
+    
+    switch(event.data) {
+        case YT.PlayerState.BUFFERING:
+            static.style.opacity = '0.3';
+            break;
+        case YT.PlayerState.PLAYING:
+            static.style.opacity = '0.05';
+            break;
+        case YT.PlayerState.ENDED:
+            static.style.opacity = '0.3';
+            // Auto switch to next channel
+            switchToNextChannel();
+            break;
     }
 }
 
+function onPlayerError(event) {
+    showErrorScreen();
+}
+
 function setupChannelButtons() {
-    const channelButtons = document.querySelectorAll('.channel-button');
+    const buttonContainer = document.getElementById('channelButtons');
     
-    channelButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Show TV static effect when changing channels
-            document.getElementById('tvStatic').style.opacity = '0.3';
-            
-            // Get video ID from data attribute
-            const videoId = this.getAttribute('data-video');
-            window.currentVideoId = videoId;
-            
-            // Change active button styling
-            channelButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Add static effect and delay video loading for retro TV feel
-            setTimeout(() => {
-                loadYouTubeVideo(videoId);
-                
-                // Reduce static effect after video loads
-                setTimeout(() => {
-                    document.getElementById('tvStatic').style.opacity = '0.05';
-                }, 1000);
-            }, 500);
-        });
+    YOUTUBE_CONFIG.channels.forEach((channel, index) => {
+        const button = document.createElement('button');
+        button.className = `channel-button ${index === 0 ? 'active' : ''}`;
+        button.textContent = `CH${index + 1}`;
+        button.addEventListener('click', () => switchChannel(index));
+        buttonContainer.appendChild(button);
     });
+}
+
+function switchChannel(index) {
+    const channel = YOUTUBE_CONFIG.channels[index];
+    const static = document.getElementById('tvStatic');
+    const buttons = document.querySelectorAll('.channel-button');
+    const channelDisplay = document.getElementById('channelDisplay');
+    
+    // Update UI
+    buttons.forEach(btn => btn.classList.remove('active'));
+    buttons[index].classList.add('active');
+    channelDisplay.textContent = `CH-${index + 1}`;
+    
+    // Show static effect
+    static.style.opacity = '0.3';
+    
+    // Switch channel with delay for effect
+    setTimeout(() => {
+        if (window.player) {
+            window.player.loadVideoById(channel.videoId);
+            updateChannelInfo(channel);
+        }
+    }, 500);
+}
+
+function switchToNextChannel() {
+    const currentIndex = parseInt(document.querySelector('.channel-button.active').textContent.replace('CH', '')) - 1;
+    const nextIndex = (currentIndex + 1) % YOUTUBE_CONFIG.channels.length;
+    switchChannel(nextIndex);
+}
+
+function updateChannelInfo(channel) {
+    const info = document.getElementById('channelInfo');
+    info.textContent = channel.name;
+}
+
+function showErrorScreen() {
+    const container = document.getElementById('ytplayer');
+    container.innerHTML = `
+        <div class="error-screen">
+            <h3>Signal Lost</h3>
+            <p>Attempting to reestablish connection...</p>
+        </div>
+    `;
+    
+    // Retry connection after delay
+    setTimeout(() => {
+        initPlayer();
+    }, YOUTUBE_CONFIG.retryDelay);
 }
